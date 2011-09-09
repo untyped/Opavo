@@ -16,11 +16,11 @@ type router_msg = add / delete / response
 // Admin
 
 admin_post() = 
- user = Dom.get_value(#user_name)
- text = Dom.get_value(#entry)
- message = {author="admin" message=text}
- do Session.send(router_channel, {user=user_id_of_string(user) message=message})
- Dom.clear_value(#entry)
+  user = Dom.get_value(#user_name)
+  text = Dom.get_value(#entry)
+  message = {author="admin" message=text}
+  do Session.send(router_channel, {user=user_id_of_string(user) message=message})
+  Dom.clear_value(#entry)
 
 
 admin_msg_handler(msg : message) = 
@@ -67,11 +67,11 @@ response_handler(state, msg: message) =
   {unchanged}
 
 post() = 
- user = Dom.get_value(#user_name)
- text = Dom.get_value(#entry)
- message = {author=user message=text}
- do Network.broadcast(message, admin_room)//Session.send(admin_channel, message)
- Dom.clear_value(#entry)
+  user = Dom.get_value(#user_name)
+  text = Dom.get_value(#entry)
+  message = {author=user message=text}
+  do Network.broadcast(message, admin_room)//Session.send(admin_channel, message)
+  Dom.clear_value(#entry)
 
 start() =
   user_name = Random.string(8)
@@ -88,9 +88,9 @@ start() =
 // Dispatch
 
 dispatch =
- | {path = [] ...}  -> start()
- | {path = ["admin"] ...} -> admin_start()
- | {path = _ ...} -> Resource.styled_page("Error", [], <p>These are not the droids you're looking for.</p>)
+  | {path = [] ...}  -> start()
+  | {path = ["admin"] ...} -> admin_start()
+  | {path = _ ...} -> Resource.styled_page("Error", [], <p>These are not the droids you're looking for.</p>)
 
 
 server = Server.of_bundle([@static_include_directory("resources")])
