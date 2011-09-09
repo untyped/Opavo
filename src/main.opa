@@ -11,7 +11,7 @@ type message = {author: string message: string}
 admin_msg_handler(state, msg : message) = {unchanged}
 admin_channel = Session.make({none}, admin_msg_handler)
 
-admin_start() = <h1>Hi admin!</h1>
+admin_start() = Resource.styled_page("Admin", [], <h1>Hi admin!</h1>)
 
 // User
 
@@ -22,14 +22,14 @@ post() =
        Dom.clear_value(#entry)
 
 start() =
-        <div class="container">
+        Resource.styled_page("Chat", [], <div class="container">
           <h1>What up dawg</h1>
           <div id=#conversation>
             <p>Nobody loves you</p>
           </div>
           <input id=#entry />
           <input type="button" value="Post"/>
-        </div>
+        </div>)
 
 // Dispatch
 
