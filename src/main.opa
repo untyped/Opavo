@@ -36,8 +36,8 @@ admin_page = Resource.styled_page("Admin", [], <div class="container">
     <div id=#conversation onready={_ -> Network.add_callback(admin_msg_handler, admin_room)}>
       Text goes here!
     </div>
-    <input id=#user_name />
-    <input id=#entry onnewline={_ -> admin_post()} />
+    <input id=#user_name placeholder="Recipient" />
+    <input id=#entry onnewline={_ -> admin_post()} placeholder="Message" />
     <input type="button" value="Post" onclick={_ -> admin_post()}/>
   </div>)
 
@@ -61,28 +61,25 @@ router_channel = Session.make(Map.empty : map(user_id, channel(message)), router
 
 // User
 
-response_handler(state, msg: message) =
+user_msg_handler(state, msg: message) =
   line = <div>admin: {msg.message}</div>
   do Dom.transform([#conversation +<- line])
   {unchanged}
 
-post() = 
-  user = Dom.get_value(#user_name)
+user_post(user) =
   text = Dom.get_value(#entry)
   message = {author=user message=text}
-  do Network.broadcast(message, admin_room)//Session.send(admin_channel, message)
+  do Network.broadcast(message, admin_room)
   Dom.clear_value(#entry)
 
 start() =
   user_name = Random.string(8)
-  user_channel =  Session.make({}, response_handler)
+  user_channel =  Session.make({}, user_msg_handler)
   do Session.send(router_channel, {user = user_id_of_string(user_name) channel = user_channel}) 
   Resource.styled_page("Chat", [], <div class="container">
    <h1>What up dawg</h1>
    <div id=#conversation/>
-   <input id=#user_name value="{user_name}"/>
-   <input id=#entry onnewline={_ -> post()} />
-   <input type="button" value="Post" onclick={_ -> post()}/>
+   <input id=#entry onnewline={_ -> user_post(user_name)} placeholder="Message" />
    </div>)
 
 // Dispatch
