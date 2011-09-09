@@ -15,6 +15,13 @@ type router_msg = add / delete / response
 
 // Admin
 
+admin_post() = 
+ text = Dom.get_value(#entry)
+ message = {author="admin" message=text}
+ do Session.send(router_channel, {user=user_id_of_string("newuser") message=message})
+ Dom.clear_value(#entry)
+
+
 admin_msg_handler(msg : message) = 
   line = <div>{msg.author}: {msg.message}</div>    
   do Debug.warning(msg.message)                   
@@ -28,8 +35,8 @@ admin_page = Resource.styled_page("Admin", [], <div class="container">
     <div id=#conversation onready={_ -> Network.add_callback(admin_msg_handler, admin_room)}>
       Text goes here!
     </div>
-    <input id=#entry/>
-    <input type="button" value="Post"/>
+    <input id=#entry onnewline={_ -> admin_post()} />
+    <input type="button" value="Post" onclick={_ -> admin_post()}/>
   </div>)
 
 admin_start() = admin_page
