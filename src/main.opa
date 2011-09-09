@@ -11,6 +11,7 @@ type message = {author: string message: string}
 admin_msg_handler(state, msg : message) = {unchanged}
 admin_channel = Session.make({none}, admin_msg_handler)
 
+admin_start() = <h1>Hi admin!</h1>
 
 // User
 
@@ -30,7 +31,13 @@ start() =
           <input type="button" value="Post"/>
         </div>
 
-server = Server.one_page_bundle("Chat",
-       [@static_resource_directory("resources")],
-       ["resources/style.css"], start)
+// Dispatch
+
+dispatch =
+         | {path = [] ...}  -> start()
+         | {path = ["admin"] ...} -> admin_start()
+
+
+server = Server.of_bundle([@static_include_directory("resources")])
+server = Server.simple_dispatch(dispatch)
 
