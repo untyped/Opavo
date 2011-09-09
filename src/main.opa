@@ -34,8 +34,9 @@ start() =
 // Dispatch
 
 dispatch =
-         | {path = [] ...}  -> start()
-         | {path = ["admin"] ...} -> admin_start()
+ | {path = [] ...}  -> start()
+ | {path = ["admin"] ...} -> admin_start()
+ | {path = _ ...} -> Resource.styled_page("Error", [], <p>These are not the droids you're looking for.</p>)
 
 
 server = Server.of_bundle([@static_include_directory("resources")])
