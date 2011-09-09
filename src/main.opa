@@ -48,7 +48,7 @@ router_handler(table, msg: router_msg) =
            table
   {set = new_table}
 
-router_channel = Session.make(StringMap.empty : stringmap(channel(response)), Session.channel(router_msg)), router_handler)
+router_channel = Session.make(StringMap.empty : stringmap(channel(response)), router_handler)
 
 // User
 
