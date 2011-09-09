@@ -4,7 +4,7 @@ import stdlib.themes.bootstrap
 
 type message = {author: string message: string}
               
-type user_id = string
+//type user_id = string
 type add = {user: user_id channel: Session.channel(message)}
 type delete = {user: user_id}
 type response = {user: user_id message: message}
@@ -39,16 +39,16 @@ admin_start() = admin_page
 router_handler(table, msg: router_msg) =
   new_table =
     match msg with
-      | ~{user, channel} -> Map.add(user, channel, table)
+      | ~{user channel} -> Map.add(user, channel, table)
       | ~{user} -> Map.remove(user, table)
-      | ~{user, message} -> 
+      | ~{user message} -> 
            do match Map.get(user, table) with
                | ~{some} -> Session.send(some, message)
                | ~{none} -> {}
            table
   {set = new_table}
 
-router_channel = Session.make({ users: Map(string, channel(router_msg)) }, router_handler)
+router_channel = Session.make(StringMap.empty : stringmap(channel(response)), Session.channel(router_msg)), router_handler)
 
 // User
 
