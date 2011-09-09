@@ -52,13 +52,19 @@ router_channel = Session.make(Map.empty : map(user_id, channel(message)), router
 
 // User
 
+response_handler(state, msg: message) =
+  
+
 post() = 
  text = Dom.get_value(#entry)
  message = {author="user" message=text}
  do Network.broadcast(message, admin_room)//Session.send(admin_channel, message)
  Dom.clear_value(#entry)
 
-start() = Resource.styled_page("Chat", [], <div class="container">
+start() =
+  user_channel =  Session.make({}, response_handler)
+  do Channel.send(router_channel, {user = "newuser" channel = user_channel}) 
+  Resource.styled_page("Chat", [], <div class="container">
    <h1>What up dawg</h1>
    <div id=#conversation/>
    <input id=#entry onnewline={_ -> post()} />
