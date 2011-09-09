@@ -3,7 +3,9 @@
 import stdlib.themes.bootstrap
 
 type message = {author: string message: string}
-                
+              
+type response = {recipient: string, message: message}
+  
 @publish admin_room = Network.cloud("admin_room"): Network.network(message)
 
 // Admin
@@ -26,6 +28,13 @@ admin_page = Resource.styled_page("Admin", [], <div class="container">
   </div>)
 
 admin_start() = admin_page
+
+// Routing
+
+router_handler(table, msg: response) =
+  {unchanged}
+
+router_channel = Session.make({ users: Map(string, channel(response)) }, router_handler)
 
 // User
 
