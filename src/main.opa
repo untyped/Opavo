@@ -4,7 +4,12 @@ import stdlib.themes.bootstrap
 
 type message = {author: string message: string}
               
-type response = {recipient: string, message: message}
+type user_id = string
+type add = {user: user_id channel: Session.channel(message)}
+type delete = {user: user_id}
+type response = {user: user_id message: message}
+type router_msg = add / delete / response
+
   
 @publish admin_room = Network.cloud("admin_room"): Network.network(message)
 
@@ -31,10 +36,19 @@ admin_start() = admin_page
 
 // Routing
 
-router_handler(table, msg: response) =
-  {unchanged}
+router_handler(table, msg: router_msg) =
+  new_table =
+    match msg with
+      | ~{user, channel} -> Map.add(user, channel, table)
+      | ~{user} -> Map.remove(user, table)
+      | ~{user, message} -> 
+           do match Map.get(user, table) with
+               | ~{some} -> Session.send(some, message)
+               | ~{none} -> {}
+           table
+  {set = new_table}
 
-router_channel = Session.make({ users: Map(string, channel(response)) }, router_handler)
+router_channel = Session.make({ users: Map(string, channel(router_msg)) }, router_handler)
 
 // User
 
