@@ -55,7 +55,7 @@ router_channel = Session.make(Map.empty : map(user_id, channel(message)), router
 response_handler(state, msg: message) =
   line = <div>admin: {msg.message}</div>
   do Dom.transform([#conversation +<- line])
-  {}
+  {unchanged}
 
 post() = 
  text = Dom.get_value(#entry)
@@ -65,7 +65,7 @@ post() =
 
 start() =
   user_channel =  Session.make({}, response_handler)
-  do Session.send(router_channel, {user = "newuser" channel = user_channel}) 
+  do Session.send(router_channel, {user = user_id_of_string("newuser") channel = user_channel}) 
   Resource.styled_page("Chat", [], <div class="container">
    <h1>What up dawg</h1>
    <div id=#conversation/>
