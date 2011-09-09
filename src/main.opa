@@ -36,7 +36,7 @@ admin_start() = admin_page
 
 // Routing
 
-router_handler(table: map(user_id, channel(response)), msg: router_msg) =
+router_handler(table: map(user_id, channel(message)), msg: router_msg) =
   new_table =
     match msg with
       | ~{user channel} -> Map.add(user, channel, table)
@@ -48,7 +48,7 @@ router_handler(table: map(user_id, channel(response)), msg: router_msg) =
            table
   {set = new_table}
 
-router_channel = Session.make(Map.empty : map(user_id, channel(response)), router_handler)
+router_channel = Session.make(Map.empty : map(user_id, channel(message)), router_handler)
 
 // User
 
