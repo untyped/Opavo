@@ -16,9 +16,10 @@ type router_msg = add / delete / response
 // Admin
 
 admin_post() = 
+ user = Dom.get_value(#user_name)
  text = Dom.get_value(#entry)
  message = {author="admin" message=text}
- do Session.send(router_channel, {user=user_id_of_string("newuser") message=message})
+ do Session.send(router_channel, {user=user_id_of_string(user) message=message})
  Dom.clear_value(#entry)
 
 
@@ -35,6 +36,7 @@ admin_page = Resource.styled_page("Admin", [], <div class="container">
     <div id=#conversation onready={_ -> Network.add_callback(admin_msg_handler, admin_room)}>
       Text goes here!
     </div>
+    <input id=#user_name />
     <input id=#entry onnewline={_ -> admin_post()} />
     <input type="button" value="Post" onclick={_ -> admin_post()}/>
   </div>)
@@ -65,17 +67,20 @@ response_handler(state, msg: message) =
   {unchanged}
 
 post() = 
+ user = Dom.get_value(#user_name)
  text = Dom.get_value(#entry)
- message = {author="user" message=text}
+ message = {author=user message=text}
  do Network.broadcast(message, admin_room)//Session.send(admin_channel, message)
  Dom.clear_value(#entry)
 
 start() =
+  user_name = Random.string(8)
   user_channel =  Session.make({}, response_handler)
-  do Session.send(router_channel, {user = user_id_of_string("newuser") channel = user_channel}) 
+  do Session.send(router_channel, {user = user_id_of_string(user_name) channel = user_channel}) 
   Resource.styled_page("Chat", [], <div class="container">
    <h1>What up dawg</h1>
    <div id=#conversation/>
+   <input id=#user_name value="{user_name}"/>
    <input id=#entry onnewline={_ -> post()} />
    <input type="button" value="Post" onclick={_ -> post()}/>
    </div>)
