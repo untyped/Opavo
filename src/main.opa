@@ -2,29 +2,33 @@
 
 import stdlib.themes.bootstrap
 
+// Types
+
 type message = {author: string message: string}
               
-//type user_id = string
 type add = {user: user_id channel: Session.channel(message)}
 type delete = {user: user_id}
 type response = {user: user_id message: message}
 type router_msg = add / delete / response
 
-  
-@publish admin_room = Network.cloud("admin_room"): Network.network(message)
+// General
+
 
 // Admin
+
+@publish admin_room = Network.cloud("admin_room"): Network.network(message)
 
 admin_post() = 
   user = Dom.get_value(#user_name)
   text = Dom.get_value(#entry)
   message = {author="admin" message=text}
   do Session.send(router_channel, {user=user_id_of_string(user) message=message})
+  do Dom.transform([#conversation +<- <div>{text}</div>])
   Dom.clear_value(#entry)
 
 
 admin_msg_handler(msg : message) = 
-  line = <div>{msg.author}: {msg.message}</div>    
+  line = <div>{msg.author}: <strong>{msg.message}</strong></div>    
   do Debug.warning(msg.message)                   
   do Dom.transform([#conversation +<- line])
   {}
@@ -62,13 +66,14 @@ router_channel = Session.make(Map.empty : map(user_id, channel(message)), router
 // User
 
 user_msg_handler(state, msg: message) =
-  line = <div>admin: {msg.message}</div>
+  line = <div>admin: <strong>{msg.message}</strong></div>
   do Dom.transform([#conversation +<- line])
   {unchanged}
 
 user_post(user) =
   text = Dom.get_value(#entry)
   message = {author=user message=text}
+  do Dom.transform([#conversation +<- <div>{text}</div>])
   do Network.broadcast(message, admin_room)
   Dom.clear_value(#entry)
 
@@ -77,7 +82,7 @@ start() =
   user_channel =  Session.make({}, user_msg_handler)
   do Session.send(router_channel, {user = user_id_of_string(user_name) channel = user_channel}) 
   Resource.styled_page("Chat", [], <div class="container">
-   <h1>What up dawg</h1>
+   <h1>What up dawg?</h1>
    <div id=#conversation/>
    <input id=#entry onnewline={_ -> user_post(user_name)} placeholder="Message" />
    </div>)
