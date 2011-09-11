@@ -2,9 +2,10 @@ package opavo.chat_pane
 
 import opavo.base
 
-type ChatPane.pane = 
-{ body: xhtml 
-  channel : Session.channel(message) }
+type ChatPane.pane =
+  { body : xhtml 
+    channel : Session.channel(message) 
+  }
 
 // A chat pane is a UI element to display chat messages
 ChatPane = {{
