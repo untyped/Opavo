@@ -1,15 +1,7 @@
 // Embeddable Opa chat client/server
-
 import stdlib.themes.bootstrap
-
-// Types
-
-type message = {author: string message: string}
-              
-type add = {user: user_id channel: Session.channel(message)}
-type delete = {user: user_id}
-type response = {user: user_id message: message}
-type router_msg = add / delete / response
+import opavo.base
+import opavo.chat_pane
 
 // General
 
@@ -65,27 +57,15 @@ router_channel = Session.make(Map.empty : map(user_id, channel(message)), router
 
 // User
 
-user_msg_handler(state, msg: message) =
-  line = <div>admin: <strong>{msg.message}</strong></div>
-  do Dom.transform([#conversation +<- line])
-  {unchanged}
-
-user_post(user) =
-  text = Dom.get_value(#entry)
-  message = {author=user message=text}
-  do Dom.transform([#conversation +<- <div>{text}</div>])
-  do Network.broadcast(message, admin_room)
-  Dom.clear_value(#entry)
-
 start() =
   user_name = Random.string(8)
-  user_channel =  Session.make({}, user_msg_handler)
-  do Session.send(router_channel, {user = user_id_of_string(user_name) channel = user_channel}) 
-  Resource.styled_page("Chat", [], <div class="container">
-   <h1>What up dawg?</h1>
-   <div id=#conversation/>
-   <input id=#entry onnewline={_ -> user_post(user_name)} placeholder="Message" />
-   </div>)
+  pane = ChatPane.make(user_name, (message -> Network.broadcast(message, admin_room)))
+  body = <div class="container">
+           <h1>Hi User!</h1>
+           {pane.body}
+         </div>
+  do Session.send(router_channel, {user = user_id_of_string(user_name) channel = pane.channel}) 
+  Resource.styled_page("Chat", [], body)
 
 // Dispatch
 
